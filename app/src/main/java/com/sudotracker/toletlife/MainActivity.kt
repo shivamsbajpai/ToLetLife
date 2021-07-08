@@ -20,9 +20,14 @@ class MainActivity : AppCompatActivity() {
         val et_password: EditText = findViewById(R.id.et_password)
         et_password.setHint("Password")
         val btn_login: Button = findViewById(R.id.btn_login)
+        val btn_send_otp: Button = findViewById(R.id.btn_send_otp)
 
         btn_login.setOnClickListener {
             val intent = Intent(this,RentalOptions::class.java)
+            startActivity(intent)
+        }
+        btn_send_otp.setOnClickListener {
+            val intent = Intent(this,RegisterActivity::class.java)
             startActivity(intent)
         }
 

@@ -13,4 +13,5 @@
     <color name="tolet_logo">#E5E5E5</color>
     <color name="background_color">#434343</color>
     <color name="edit_text_color">#343434</color>
+    <color name="error_color">#E81111</color>
 </resources>
