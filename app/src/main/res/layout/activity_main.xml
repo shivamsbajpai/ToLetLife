@@ -41,7 +41,7 @@
             android:orientation="vertical"
             android:padding="16dp">
             <EditText
-                android:id="@+id/et_email"
+                android:id="@+id/et_login_email"
                 android:hint="Email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                 android:backgroundTint="@color/edit_text_color"
                 android:textColorHint="@color/input_text_color" />
             <EditText
-                android:id="@+id/et_password"
+                android:id="@+id/et_login_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"

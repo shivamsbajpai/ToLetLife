@@ -14,7 +14,7 @@
         <activity android:name=".RegisterActivity"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarTheme"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="stateHidden|adjustResize|adjustNothing"></activity>
         <activity
             android:name=".RentalOptions"
             android:screenOrientation="portrait"
