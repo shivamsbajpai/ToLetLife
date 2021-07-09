@@ -119,6 +119,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:hint="Email"
+                android:inputType="text"
+                android:imeOptions="actionDone"
                 android:textColorHint="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
                 android:textColor="@color/input_text_color"
