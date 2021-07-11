@@ -36,17 +36,23 @@ class MainActivity : AppCompatActivity() {
         val btn_login: Button = findViewById(R.id.btn_login)
         val btn_send_otp: Button = findViewById(R.id.btn_send_otp)
         val et_send_otp_email: EditText = findViewById(R.id.et_send_otp_email)
+
         val intent_email = intent.getStringExtra("email")
-        if(intent_email != null){
+
+        if (intent_email != null) {
             et_login_email.setText(intent_email)
             saveToken(null)
         }
 
-        val jwtToken = loadData()
+        val jwtToken = loadJWTTokenData()
+
         if(jwtToken != null){
-            val intent = Intent(this, RentalOptions::class.java)
+            val intent = Intent(this, UploadImageActivity::class.java)
+            intent.putExtra("rent_id","ebc48f9f-d210-4397-a86c-2f7e40cf85f0")
             startActivity(intent)
+            finish()
         }
+
         et_send_otp_email.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && (event.action == KeyEvent.ACTION_UP || event.action == KeyEvent.ACTION_DOWN)) {
                 btn_send_otp.performClick()
@@ -61,15 +67,15 @@ class MainActivity : AppCompatActivity() {
             et_login_email.setText("")
             val password = et_login_password.text
             et_login_password.setText("")
-            if(email.toString() != "" && password.toString() != ""){
-                sendLogin(email.toString(),password.toString())
+            if (email.toString() != "" && password.toString() != "") {
+                sendLogin(email.toString(), password.toString())
             }
         }
 
         btn_send_otp.setOnClickListener {
             val email = et_send_otp_email.text
             et_send_otp_email.setText("")
-            if(email.toString() != ""){
+            if (email.toString() != "") {
                 sendOtp(email.toString())
             }
         }
@@ -86,65 +92,90 @@ class MainActivity : AppCompatActivity() {
                     val type = object : TypeToken<ValidationErrorResponse>() {}.type
                     val errorResponse: ValidationErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
-                    Toast.makeText(this@MainActivity,errorResponse?.detail?.first()?.msg.toString(),Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        errorResponse?.detail?.first()?.msg.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
                     return
                 } else if (response.code() > 399) {
                     val type = object : TypeToken<ErrorResponse>() {}.type
                     val errorResponse: ErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
-                    if(errorResponse?.detail.toString().contains("Otp already sent to")){
+                    if (errorResponse?.detail.toString().contains("Otp already sent to")) {
                         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        Toast.makeText(this@MainActivity,errorResponse?.detail.toString(),Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@MainActivity,
+                            errorResponse?.detail.toString(),
+                            Toast.LENGTH_LONG
+                        ).show()
                         startActivity(intent)
+                        finish()
                         return
                     }
-                    Toast.makeText(this@MainActivity,errorResponse?.detail.toString(),Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        errorResponse?.detail.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
                     return
-                }else if (response.code() == 200) {
+                } else if (response.code() == 200) {
                     val jsonResponse = gson.toJson(response.body())
-                    val resp: OtpResponse = gson.fromJson(jsonResponse,OtpResponse::class.java)
+                    val resp: OtpResponse = gson.fromJson(jsonResponse, OtpResponse::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    Toast.makeText(this@MainActivity,resp.otpResponse,Toast.LENGTH_LONG).show()
-                    intent.putExtra("email",email)
+                    Toast.makeText(this@MainActivity, resp.otpResponse, Toast.LENGTH_LONG).show()
+                    intent.putExtra("email", email)
                     startActivity(intent)
+                    finish()
                     return
                 }
             }
+
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 Log.d("failure", "Error in failure", t)
             }
         })
     }
 
-    private fun sendLogin(email: String,password: String){
-        val loginRequest = LoginRequest(email,password)
+    private fun sendLogin(email: String, password: String) {
+        val loginRequest = LoginRequest(email, password)
         val call = IdentityService.identityInstance.sendLogin(loginRequest)
         val intent = Intent(this, RentalOptions::class.java)
         val gson = Gson()
-        call.enqueue(object : Callback<Any>{
+        call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
                 if (response.code() == 422) {
                     val type = object : TypeToken<ValidationErrorResponse>() {}.type
                     val errorResponse: ValidationErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
-                    Toast.makeText(this@MainActivity,errorResponse?.detail?.first()?.msg.toString(),Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        errorResponse?.detail?.first()?.msg.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
                     return
                 } else if (response.code() > 399) {
                     val type = object : TypeToken<ErrorResponse>() {}.type
                     val errorResponse: ErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
-                    Toast.makeText(this@MainActivity,errorResponse?.detail.toString(),Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        errorResponse?.detail.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
                     return
-                }else if (response.code() == 200) {
+                } else if (response.code() == 200) {
                     val jsonResponse = gson.toJson(response.body())
-                    val resp: LoginResponse = gson.fromJson(jsonResponse,LoginResponse::class.java)
+                    val resp: LoginResponse = gson.fromJson(jsonResponse, LoginResponse::class.java)
                     saveToken(resp.token)
                     intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    Toast.makeText(this@MainActivity,"Login Successful",Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@MainActivity, "Login Successful", Toast.LENGTH_LONG).show()
                     startActivity(intent)
+                    finish()
                     return
                 }
             }
+
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 Log.d("failure", "Error in failure", t)
             }
@@ -152,15 +183,19 @@ class MainActivity : AppCompatActivity() {
         })
 
     }
-    private fun saveToken(token: String?){
+
+    private fun saveToken(token: String?) {
         val sharedPreferences = getSharedPreferences("jwtToken", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.apply{
-            putString("JWT_TOKEN",token)
+        editor.apply {
+            putString("JWT_TOKEN", token)
         }.apply()
     }
-    private fun loadData(): String?{
-        val sharedPreferences = getSharedPreferences("jwtToken",Context.MODE_PRIVATE)
-        return sharedPreferences.getString("JWT_TOKEN",null)
+
+    private fun loadJWTTokenData(): String? {
+        val sharedPreferences = getSharedPreferences("jwtToken", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("JWT_TOKEN", null)
     }
+
+
 }

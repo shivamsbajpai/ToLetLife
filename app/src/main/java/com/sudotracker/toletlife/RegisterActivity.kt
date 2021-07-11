@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -32,6 +34,8 @@ class RegisterActivity : AppCompatActivity() {
         val et_register_confirm_password: EditText = findViewById(R.id.et_register_confirm_password)
         val tv_register_error: TextView = findViewById(R.id.tv_register_error)
         val btn_register: Button = findViewById(R.id.btn_register)
+
+        et_register_phone_number.setText("+91")
 
         val intent_email = intent.getStringExtra("email")
         et_register_email.setText(intent_email)
@@ -99,6 +103,7 @@ class RegisterActivity : AppCompatActivity() {
                     Toast.makeText(this@RegisterActivity, "Registration Successful", Toast.LENGTH_LONG).show()
                     intent.putExtra("email",email)
                     startActivity(intent)
+                    finish()
                     return
                 }
             }

@@ -11,18 +11,15 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-const val BASE_URL = "https://toletlife.herokuapp.com/"
-const val VERSION_PREFIX = "api/v1/"
-const val SERVICE_PREFIX = "identity"
-const val URL_PREFIX = VERSION_PREFIX + SERVICE_PREFIX
+const val BASE_URL = "https://toletlife.herokuapp.com/api/v1/"
 interface IdentityInterface{
-    @POST("${URL_PREFIX}/sendotp")
+    @POST("identity/sendotp")
     fun sendOtp(@Body otpRequest: OtpRequest):Call<Any>
 
-    @POST("${URL_PREFIX}/loginuser")
+    @POST("identity/loginuser")
     fun sendLogin(@Body loginRequest: LoginRequest):Call<Any>
 
-    @POST("${URL_PREFIX}/registeruser")
+    @POST("identity/registeruser")
     fun registerUser(@Body registerRequest: RegisterRequest):Call<Any>
 }
 
