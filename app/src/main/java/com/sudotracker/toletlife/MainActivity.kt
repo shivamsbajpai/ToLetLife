@@ -1,16 +1,20 @@
 package com.sudotracker.toletlife
 
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sudotracker.toletlife.Error.ErrorResponse
@@ -24,6 +28,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         val btn_login: Button = findViewById(R.id.btn_login)
         val btn_send_otp: Button = findViewById(R.id.btn_send_otp)
         val et_send_otp_email: EditText = findViewById(R.id.et_send_otp_email)
+        progressBarVisibility(false)
 
         val intent_email = intent.getStringExtra("email")
 
@@ -46,9 +52,8 @@ class MainActivity : AppCompatActivity() {
 
         val jwtToken = loadJWTTokenData()
 
-        if(jwtToken != null){
-            val intent = Intent(this, UploadImageActivity::class.java)
-            intent.putExtra("rent_id","ebc48f9f-d210-4397-a86c-2f7e40cf85f0")
+        if (jwtToken != null) {
+            val intent = Intent(this, RentalOptions::class.java)
             startActivity(intent)
             finish()
         }
@@ -80,15 +85,27 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    //function to hide the keyboard
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        currentFocus?.let {
+            val imm: InputMethodManager = getSystemService(
+                Context.INPUT_METHOD_SERVICE
+            ) as (InputMethodManager)
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
     private fun sendOtp(email: String) {
         val otpRequest = OtpRequest(email)
         val call = IdentityService.identityInstance.sendOtp(otpRequest)
         val intent = Intent(this, RegisterActivity::class.java)
         val gson = Gson()
+        progressBarVisibility(true)
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
                 if (response.code() == 422) {
+                    progressBarVisibility(false)
                     val type = object : TypeToken<ValidationErrorResponse>() {}.type
                     val errorResponse: ValidationErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
@@ -99,10 +116,12 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                     return
                 } else if (response.code() > 399) {
+                    progressBarVisibility(false)
                     val type = object : TypeToken<ErrorResponse>() {}.type
                     val errorResponse: ErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
                     if (errorResponse?.detail.toString().contains("Otp already sent to")) {
+
                         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                         Toast.makeText(
                             this@MainActivity,
@@ -113,6 +132,7 @@ class MainActivity : AppCompatActivity() {
                         finish()
                         return
                     }
+                    progressBarVisibility(false)
                     Toast.makeText(
                         this@MainActivity,
                         errorResponse?.detail.toString(),
@@ -120,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                     return
                 } else if (response.code() == 200) {
+                    progressBarVisibility(false)
                     val jsonResponse = gson.toJson(response.body())
                     val resp: OtpResponse = gson.fromJson(jsonResponse, OtpResponse::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -128,10 +149,23 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                     return
+                } else {
+                    progressBarVisibility(false)
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Could not connect to internet. Please try again.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
+                progressBarVisibility(false)
+                Toast.makeText(
+                    this@MainActivity,
+                    "Could not connect to internet. Please try again.",
+                    Toast.LENGTH_LONG
+                ).show()
                 Log.d("failure", "Error in failure", t)
             }
         })
@@ -142,6 +176,7 @@ class MainActivity : AppCompatActivity() {
         val call = IdentityService.identityInstance.sendLogin(loginRequest)
         val intent = Intent(this, RentalOptions::class.java)
         val gson = Gson()
+        progressBarVisibility(true)
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
                 if (response.code() == 422) {
@@ -153,6 +188,7 @@ class MainActivity : AppCompatActivity() {
                         errorResponse?.detail?.first()?.msg.toString(),
                         Toast.LENGTH_LONG
                     ).show()
+                    progressBarVisibility(false)
                     return
                 } else if (response.code() > 399) {
                     val type = object : TypeToken<ErrorResponse>() {}.type
@@ -163,8 +199,10 @@ class MainActivity : AppCompatActivity() {
                         errorResponse?.detail.toString(),
                         Toast.LENGTH_LONG
                     ).show()
+                    progressBarVisibility(false)
                     return
                 } else if (response.code() == 200) {
+                    progressBarVisibility(false)
                     val jsonResponse = gson.toJson(response.body())
                     val resp: LoginResponse = gson.fromJson(jsonResponse, LoginResponse::class.java)
                     saveToken(resp.token)
@@ -173,11 +211,24 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                     return
+                } else {
+                    progressBarVisibility(false)
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Could not connect to internet. Please try again.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
-                Log.d("failure", "Error in failure", t)
+                progressBarVisibility(false)
+                Log.d("failure", "Error in failure login", t)
+                Toast.makeText(
+                    this@MainActivity,
+                    "Could not connect to internet. Please try again.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
         })
@@ -197,5 +248,12 @@ class MainActivity : AppCompatActivity() {
         return sharedPreferences.getString("JWT_TOKEN", null)
     }
 
-
+    private fun progressBarVisibility(visibility: Boolean) {
+        val progress: ProgressBar = findViewById(R.id.main_activity_circular_progress_load)
+        if (visibility) {
+            progress.visibility = View.VISIBLE
+        } else {
+            progress.visibility = View.GONE
+        }
+    }
 }

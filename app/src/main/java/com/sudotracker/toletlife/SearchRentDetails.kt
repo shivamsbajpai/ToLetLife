@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,50 +24,35 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class RentalOptions : AppCompatActivity() {
-
+class SearchRentDetails : AppCompatActivity() {
     private lateinit var newRecyclerview: RecyclerView
     private lateinit var newArrayList: ArrayList<UserAllRentDetailsItem>
-    lateinit var imageId: Array<Int>
-    lateinit var heading: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_rental_options)
+        setContentView(R.layout.activity_search_rent_details)
+        progressBarVisibility(false)
         setBottomNavigationBarProperties()
-//
-//        imageId = arrayOf(
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle
-//        )
+        val searchView: SearchView = findViewById(R.id.search_view)
+        val search_term = searchView.query
 
-//        heading = arrayOf(
-//            "Argentina",
-//            "Australia",
-//            "Belgium",
-//            "Denmark",
-//            "Brazil",
-//            "Fiji",
-//            "Germany",
-//            "India",
-//            "Kuwait",
-//            "New Zealand"
-//        )
-
-        newRecyclerview = findViewById(R.id.rv_rentalOptions)
+        newRecyclerview = findViewById(R.id.rv_search_rent)
         newRecyclerview.layoutManager = LinearLayoutManager(this)
         newRecyclerview.setHasFixedSize(true)
 
         newArrayList = ArrayList<UserAllRentDetailsItem>()
-        getAllRentDetails()
+        Log.i("very different",search_term.toString())
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                newArrayList = ArrayList<UserAllRentDetailsItem>()
+                search(query)
+                return false
+            }
+            override fun onQueryTextChange(newText: String): Boolean {
+
+                return false
+            }
+        })
 
     }
 
@@ -95,7 +81,7 @@ class RentalOptions : AppCompatActivity() {
         adapter.setOnItemClickListener(object : RvAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
                 Toast.makeText(
-                    this@RentalOptions,
+                    this@SearchRentDetails,
                     "You clicked on item no. $position",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -104,11 +90,11 @@ class RentalOptions : AppCompatActivity() {
         })
     }
 
-    private fun getAllRentDetails() {
+    private fun search(search_term: String) {
         progressBarVisibility(true)
         val jwtToken = loadJWTTokenData()
         val call =
-            RentDetailsService.rentDetailsInstance.getAllRentDetails(token = "Bearer $jwtToken")
+            RentDetailsService.rentDetailsInstance.search(search_term = search_term,token = "Bearer $jwtToken")
         val gson = Gson()
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
@@ -117,7 +103,7 @@ class RentalOptions : AppCompatActivity() {
                     val errorResponse: ValidationErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
                     Toast.makeText(
-                        this@RentalOptions,
+                        this@SearchRentDetails,
                         errorResponse?.detail?.first()?.msg.toString(),
                         Toast.LENGTH_LONG
                     ).show()
@@ -127,7 +113,7 @@ class RentalOptions : AppCompatActivity() {
                     val errorResponse: ErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
                     Toast.makeText(
-                        this@RentalOptions,
+                        this@SearchRentDetails,
                         errorResponse?.detail.toString(),
                         Toast.LENGTH_LONG
                     ).show()
@@ -143,7 +129,7 @@ class RentalOptions : AppCompatActivity() {
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 Toast.makeText(
-                    this@RentalOptions,
+                    this@SearchRentDetails,
                     "Could not connect to internet. Please try again.",
                     Toast.LENGTH_LONG
                 ).show()
@@ -153,6 +139,7 @@ class RentalOptions : AppCompatActivity() {
         })
 
     }
+
 
     private fun loadJWTTokenData(): String? {
         val sharedPreferences = getSharedPreferences("jwtToken", Context.MODE_PRIVATE)
@@ -166,12 +153,11 @@ class RentalOptions : AppCompatActivity() {
             putString("JWT_TOKEN", token)
         }.apply()
     }
-
     private fun setBottomNavigationBarProperties() {
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.search_bottomNavigationView)
         bottomNavigationView.background = null
         bottomNavigationView.menu.getItem(2).isEnabled = false
-        val fab: FloatingActionButton = findViewById(R.id.fab)
+        val fab: FloatingActionButton = findViewById(R.id.search_fab)
 
         bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
             val intent = Intent(this, RentalOptions::class.java)
@@ -206,7 +192,7 @@ class RentalOptions : AppCompatActivity() {
 
     private fun progressBarVisibility(visibility: Boolean) {
         val progress: ProgressBar =
-            findViewById(R.id.rental_options_activity_circular_progress_load)
+            findViewById(R.id.search_activity_circular_progress_load)
         if (visibility) {
             progress.visibility = View.VISIBLE
         } else {

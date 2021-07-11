@@ -1,15 +1,15 @@
 package com.sudotracker.toletlife
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
 import androidx.core.view.isVisible
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -36,6 +36,7 @@ class RegisterActivity : AppCompatActivity() {
         val btn_register: Button = findViewById(R.id.btn_register)
 
         et_register_phone_number.setText("+91")
+        progressBarVisibility(false)
 
         val intent_email = intent.getStringExtra("email")
         et_register_email.setText(intent_email)
@@ -61,8 +62,17 @@ class RegisterActivity : AppCompatActivity() {
             }
             registerUser(name, phone_number, email, otp_code, password)
         }
+    }
 
-
+    //function to hide the keyboard
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        currentFocus?.let {
+            val imm: InputMethodManager = getSystemService(
+                Context.INPUT_METHOD_SERVICE
+            ) as (InputMethodManager)
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun registerUser(
@@ -76,9 +86,11 @@ class RegisterActivity : AppCompatActivity() {
         val call = IdentityService.identityInstance.registerUser(registerRequest)
         val intent = Intent(this, MainActivity::class.java)
         val gson = Gson()
+        progressBarVisibility(true)
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
                 if (response.code() == 422) {
+                    progressBarVisibility(false)
                     val type = object : TypeToken<ValidationErrorResponse>() {}.type
                     val errorResponse: ValidationErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
@@ -89,6 +101,7 @@ class RegisterActivity : AppCompatActivity() {
                     ).show()
                     return
                 } else if (response.code() > 399) {
+                    progressBarVisibility(false)
                     val type = object : TypeToken<ErrorResponse>() {}.type
                     val errorResponse: ErrorResponse? =
                         gson.fromJson(response.errorBody()?.charStream(), type)
@@ -99,17 +112,38 @@ class RegisterActivity : AppCompatActivity() {
                     ).show()
                     return
                 } else if (response.code() == 201) {
+                    progressBarVisibility(false)
                     intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    Toast.makeText(this@RegisterActivity, "Registration Successful", Toast.LENGTH_LONG).show()
-                    intent.putExtra("email",email)
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Registration Successful",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    intent.putExtra("email", email)
                     startActivity(intent)
                     finish()
                     return
                 }
             }
+
             override fun onFailure(call: Call<Any>, t: Throwable) {
+                progressBarVisibility(false)
+                Toast.makeText(
+                    this@RegisterActivity,
+                    "Could not connect to internet. Please try again.",
+                    Toast.LENGTH_LONG
+                ).show()
                 Log.d("failure", "Error in failure", t)
             }
         })
+    }
+
+    private fun progressBarVisibility(visibility: Boolean) {
+        val progress: ProgressBar = findViewById(R.id.register_activity_circular_progress_load)
+        if (visibility) {
+            progress.visibility = View.VISIBLE
+        } else {
+            progress.visibility = View.GONE
+        }
     }
 }

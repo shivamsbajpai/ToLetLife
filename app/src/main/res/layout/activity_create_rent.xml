@@ -7,9 +7,9 @@
     android:gravity="top"
     android:background="@color/background_color"
     android:orientation="vertical"
-    tools:context=".RegisterActivity">
+    tools:context=".CreateRentActivity">
     <ProgressBar
-        android:id="@+id/register_activity_circular_progress_load"
+        android:id="@+id/create_rent_activity_circular_progress_load"
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,17 +18,17 @@
         />
 
     <TextView
-        android:id="@+id/tv_register_activity_app_name"
+        android:id="@+id/tv_create_rent_activity_app_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:padding="10dp"
         android:fontFamily="@font/bree_serif"
         android:layout_alignParentTop="true"
         android:gravity="center"
-        android:text="ToLet Life"
+        android:text="Rent your happy place"
         android:textColor="@color/tolet_logo"
-        android:textSize="50sp"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
     <androidx.cardview.widget.CardView
@@ -36,8 +36,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_below="@+id/tv_register_activity_app_name"
-        android:layout_marginTop="50dp"
+        android:layout_below="@+id/tv_create_rent_activity_app_name"
+        android:layout_marginTop="10dp"
         app:cardBackgroundColor="@color/background_color"
         app:cardCornerRadius="15dp"
         app:cardElevation="5dp">
@@ -49,8 +49,8 @@
             android:padding="16dp">
 
             <EditText
-                android:id="@+id/et_register_name"
-                android:hint="Name"
+                android:id="@+id/et_create_rent_city"
+                android:hint="City"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -60,8 +60,8 @@
                 android:backgroundTint="@color/edit_text_color"
                 android:textColorHint="@color/input_text_color" />
             <EditText
-                android:id="@+id/et_register_phone_number"
-                android:hint="Phone Number"
+                android:id="@+id/et_create_rent_area"
+                android:hint="Area"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -71,8 +71,8 @@
                 android:backgroundTint="@color/edit_text_color"
                 android:textColorHint="@color/input_text_color" />
             <EditText
-                android:id="@+id/et_register_email"
-                android:hint="Email"
+                android:id="@+id/et_create_rent_address"
+                android:hint="Address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -82,8 +82,20 @@
                 android:backgroundTint="@color/edit_text_color"
                 android:textColorHint="@color/input_text_color" />
             <EditText
-                android:id="@+id/et_register_otp"
-                android:hint="OTP"
+                android:id="@+id/et_create_rent_pincode"
+                android:hint="Pincode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:textSize="20sp"
+                android:inputType="number"
+                android:textColor="@color/input_text_color"
+                android:backgroundTint="@color/edit_text_color"
+                android:textColorHint="@color/input_text_color" />
+            <EditText
+                android:id="@+id/et_create_rent_state"
+                android:hint="State"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -93,31 +105,19 @@
                 android:backgroundTint="@color/edit_text_color"
                 android:textColorHint="@color/input_text_color" />
             <EditText
-                android:id="@+id/et_register_password"
-                android:hint="Password"
+                android:id="@+id/et_create_rent_monthly_rent"
+                android:hint="Monthly Rent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text=""
-                android:inputType="textPassword"
-                android:textSize="20sp"
-                android:textColor="@color/input_text_color"
-                android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
-            <EditText
-                android:id="@+id/et_register_confirm_password"
-                android:hint="Confirm Password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text=""
-                android:inputType="textPassword"
+                android:inputType="number"
                 android:textSize="20sp"
                 android:textColor="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
                 android:textColorHint="@color/input_text_color" />
             <TextView
-                android:id="@+id/tv_register_error"
+                android:id="@+id/tv_create_rent_error"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Error"
@@ -126,11 +126,11 @@
                 />
             <Button
                 style="?android:attr/borderlessButtonStyle"
-                android:id="@+id/btn_register"
+                android:id="@+id/btn_create_rent_upload_images"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Register"
+                android:text="Upload Images"
                 android:textSize="18sp"
                 android:textColor="@android:color/white"
                 app:backgroundTint="@color/button_color"
@@ -140,5 +140,39 @@
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/create_rent_coordinator"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true">
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/create_rent_bottomAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:fabCradleMargin="20dp"
+            app:fabCradleRoundedCornerRadius="20dp"
+            app:fabCradleVerticalOffset="10dp"
+            app:backgroundTint="@color/background_color">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/create_rent_bottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                android:background="@android:color/transparent"
+                app:menu="@menu/bottom_nav_menu" />
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/create_rent_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/button_color"
+            android:src="@drawable/ic_add"
+            app:layout_anchor="@id/create_rent_bottomAppBar" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </RelativeLayout>

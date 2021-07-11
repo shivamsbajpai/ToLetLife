@@ -15,6 +15,8 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sudotracker.toletlife.Error.ErrorResponse
@@ -49,6 +51,8 @@ class UploadImageActivity : AppCompatActivity() {
 
         val rent_id = intent.getStringExtra("rent_id")
 
+        setBottomNavigationBarProperties()
+
 
         image_view.setOnClickListener {
             openImageChooser()
@@ -60,6 +64,7 @@ class UploadImageActivity : AppCompatActivity() {
         }
 
     }
+
     private fun openImageChooser() {
         Intent(Intent.ACTION_PICK).also {
             it.type = "image/*"
@@ -68,6 +73,7 @@ class UploadImageActivity : AppCompatActivity() {
             startActivityForResult(it, REQUEST_CODE_PICK_IMAGE)
         }
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val image_view: ImageView = findViewById(R.id.image_view)
@@ -80,10 +86,11 @@ class UploadImageActivity : AppCompatActivity() {
             }
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun uploadImage(rent_id: String) {
         if (selectedImageUri == null) {
-            //layout_root.snackbar("Select an Image First")
+            Toast.makeText(this, "Please select the image", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -95,9 +102,9 @@ class UploadImageActivity : AppCompatActivity() {
         val file_type = contentResolver.getType(selectedImageUri!!)
         val outputStream = FileOutputStream(file)
         inputStream.copyTo(outputStream)
-        presignedUrl(file_type!!,rent_id,loadJWTTokenData(),file)
+        presignedUrl(file_type!!, rent_id, loadJWTTokenData(), file)
 
-       // progress_bar.progress = 0
+        // progress_bar.progress = 0
 //        val body = UploadRequestBody(file, "image", this)
 //        MyAPI().uploadImage(
 //            MultipartBody.Part.createFormData(
@@ -124,6 +131,7 @@ class UploadImageActivity : AppCompatActivity() {
 //        })
 
     }
+
     fun ContentResolver.getFileName(fileUri: Uri): String {
         var name = ""
         val returnCursor = this.query(fileUri, null, null, null, null)
@@ -136,15 +144,17 @@ class UploadImageActivity : AppCompatActivity() {
         return name
     }
 
-    private fun presignedUrl(file_type: String,rent_id: String,token: String?, file: File) {
+    private fun presignedUrl(file_type: String, rent_id: String, token: String?, file: File) {
+        val progress_bar: ProgressBar = findViewById(R.id.progress_bar)
+        progress_bar.progress = 0
         val call = ImageService.imageInstance.presignedUrl(
             file_name = file.name,
             file_type = file_type,
             rent_id = rent_id,
             token = "Bearer $token"
         )
-        Log.i("file_name",file.name)
-        Log.i("file_type",file_type)
+        Log.i("file_name", file.name)
+        Log.i("file_type", file_type)
         val gson = Gson()
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
@@ -172,7 +182,7 @@ class UploadImageActivity : AppCompatActivity() {
                     val jsonResponse = gson.toJson(response.body())
                     val resp: PresignedURLResponse =
                         gson.fromJson(jsonResponse, PresignedURLResponse::class.java)
-
+                    progress_bar.progress = 20
                     sendToAws(
                         rent_id,
                         resp.url,
@@ -189,6 +199,7 @@ class UploadImageActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
+                Toast.makeText(this@UploadImageActivity,"Could not connect to internet. Please try again.", Toast.LENGTH_LONG).show()
                 Log.d("failure", "Error in failure", t)
             }
 
@@ -207,7 +218,8 @@ class UploadImageActivity : AppCompatActivity() {
         sxmzSignature: String,
         sfile: File
     ) {
-        val requestBodyFile_address_aws: RequestBody = RequestBody.create(MediaType.parse("text/plain"), file_address_aws)
+        val requestBodyFile_address_aws: RequestBody =
+            RequestBody.create(MediaType.parse("text/plain"), file_address_aws)
         val xmzAlgorithm: RequestBody =
             RequestBody.create(MediaType.parse("text/plain"), sxmzAlgorithm)
         val xmzCredential: RequestBody =
@@ -219,7 +231,6 @@ class UploadImageActivity : AppCompatActivity() {
         val file: RequestBody = RequestBody.create(MediaType.parse("image/*"), sfile)
 
         val progress_bar: ProgressBar = findViewById(R.id.progress_bar)
-        progress_bar.progress = 0
         val call = ImageService.imageInstance.sendToAws(
             url = url,
             key = requestBodyFile_address_aws,
@@ -230,7 +241,7 @@ class UploadImageActivity : AppCompatActivity() {
             signature = xmzSignature,
             file = file
         )
-        Log.i("key",file_address_aws)
+        Log.i("key", file_address_aws)
 
         val gson = Gson()
 
@@ -257,25 +268,27 @@ class UploadImageActivity : AppCompatActivity() {
                     ).show()
                     return
                 } else if (response.code() == 204) {
-                    saveImageDetails(rent_id,file_address_aws,loadJWTTokenData())
-                    progress_bar.progress = 100
+                    progress_bar.progress = 60
+                    saveImageDetails(rent_id, file_address_aws, loadJWTTokenData())
                     return
                 }
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 progress_bar.progress = 0
+                Toast.makeText(this@UploadImageActivity,"Could not connect to internet. Please try again.", Toast.LENGTH_LONG).show()
                 Log.d("failure", "Error in failure", t)
             }
         })
     }
 
-    private fun saveImageDetails(rent_id: String,file_address_aws: String,token: String?) {
+    private fun saveImageDetails(rent_id: String, file_address_aws: String, token: String?) {
         val image_details = UploadImageRequest(rent_id, file_address_aws)
-        Log.i("rent_id",rent_id)
-        Log.i("file_address_aws",file_address_aws)
-        val call = ImageService.imageInstance.saveImageDetails(image_details,token = "Bearer $token")
-        //val intent = Intent(this, RegisterActivity::class.java)
+        Log.i("rent_id", rent_id)
+        Log.i("file_address_aws", file_address_aws)
+        val call =
+            ImageService.imageInstance.saveImageDetails(image_details, token = "Bearer $token")
+        val progress_bar: ProgressBar = findViewById(R.id.progress_bar)
         val gson = Gson()
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
@@ -298,26 +311,69 @@ class UploadImageActivity : AppCompatActivity() {
 //                        errorResponse?.detail.toString(),
 //                        Toast.LENGTH_LONG
 //                    ).show()
-                    Log.i("error_response",response.toString())
+                    Log.i("error_response", response.toString())
                     return
                 } else if (response.code() == 200) {
-                    Log.i("success","this was successful")
-                    Toast.makeText(this@UploadImageActivity,"Image Uploaded Successfully",Toast.LENGTH_LONG).show()
+                    progress_bar.progress = 100
+                    Toast.makeText(
+                        this@UploadImageActivity,
+                        "Image Uploaded Successfully",
+                        Toast.LENGTH_LONG
+                    ).show()
                     return
                 }
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
+                Toast.makeText(this@UploadImageActivity,"Could not connect to internet. Please try again.", Toast.LENGTH_LONG).show()
                 Log.d("failure", "Error in failure", t)
             }
         })
     }
 
 
-
     private fun loadJWTTokenData(): String? {
         val sharedPreferences = getSharedPreferences("jwtToken", Context.MODE_PRIVATE)
         return sharedPreferences.getString("JWT_TOKEN", null)
+    }
+
+    private fun saveToken(token: String?) {
+        val sharedPreferences = getSharedPreferences("jwtToken", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.apply {
+            putString("JWT_TOKEN", token)
+        }.apply()
+    }
+
+    private fun setBottomNavigationBarProperties(){
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.upload_image_bottomNavigationView)
+        bottomNavigationView.background = null
+        bottomNavigationView.menu.getItem(2).isEnabled = false
+        val fab: FloatingActionButton = findViewById(R.id.upload_image_fab)
+
+        bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
+            val intent = Intent(this, RentalOptions::class.java)
+            startActivity(intent)
+            finish()
+            return@setOnMenuItemClickListener true
+        }
+
+        bottomNavigationView.menu.getItem(4).setOnMenuItemClickListener {
+            saveToken(null)
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+            return@setOnMenuItemClickListener true
+        }
+
+
+        fab.setOnClickListener{
+            val intent = Intent(this, CreateRentActivity::class.java)
+            //intent.putExtra("rent_id", "c6b0a47d-d01b-46ac-a5d9-557ef5fc1b6c")
+            startActivity(intent)
+            finish()
+        }
+
     }
 
 }

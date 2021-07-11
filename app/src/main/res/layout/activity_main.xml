@@ -8,6 +8,14 @@
     android:background="@color/background_color"
     android:orientation="vertical"
     tools:context=".MainActivity">
+    <ProgressBar
+        android:id="@+id/main_activity_circular_progress_load"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:progressTint="@color/button_color"
+        />
 
     <TextView
         android:id="@+id/tv_main_activity_app_name"
