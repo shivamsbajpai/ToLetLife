@@ -20,7 +20,7 @@ interface ImageInterface {
     @POST
     fun sendToAws(
         @Url url: String,
-        @Part("key") file_name: RequestBody,
+        @Part("key") key: RequestBody,
         @Part("x-amz-algorithm") algorithm: RequestBody,
         @Part("x-amz-credential") credential: RequestBody,
         @Part("x-amz-date") date: RequestBody,

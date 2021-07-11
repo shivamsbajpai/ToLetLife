@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Fields(
     @SerializedName("key")
-    val key: String,
+    val file_address_aws: String,
     @SerializedName("policy")
     val policy: String,
     @SerializedName("x-amz-algorithm")

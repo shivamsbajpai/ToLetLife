@@ -12,17 +12,15 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sudotracker.toletlife.Error.ErrorResponse
 import com.sudotracker.toletlife.Error.ValidationErrorResponse
-import com.sudotracker.toletlife.Requests.OtpRequest
 import com.sudotracker.toletlife.Requests.UploadImageRequest
-import com.sudotracker.toletlife.Responses.OtpResponse
 import com.sudotracker.toletlife.Responses.PresignedURLResponse
-import com.sudotracker.toletlife.Services.IdentityService
 import com.sudotracker.toletlife.Services.ImageService
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -145,6 +143,8 @@ class UploadImageActivity : AppCompatActivity() {
             rent_id = rent_id,
             token = "Bearer $token"
         )
+        Log.i("file_name",file.name)
+        Log.i("file_type",file_type)
         val gson = Gson()
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
@@ -176,7 +176,7 @@ class UploadImageActivity : AppCompatActivity() {
                     sendToAws(
                         rent_id,
                         resp.url,
-                        resp.fields.key,
+                        resp.fields.file_address_aws,
                         resp.fields.xAmzAlgorithm,
                         resp.fields.xAmzCredential,
                         resp.fields.xAmzDate,
@@ -199,7 +199,7 @@ class UploadImageActivity : AppCompatActivity() {
     private fun sendToAws(
         rent_id: String,
         url: String,
-        skey: String,
+        file_address_aws: String,
         sxmzAlgorithm: String,
         sxmzCredential: String,
         sxmzDate: String,
@@ -207,7 +207,7 @@ class UploadImageActivity : AppCompatActivity() {
         sxmzSignature: String,
         sfile: File
     ) {
-        val key: RequestBody = RequestBody.create(MediaType.parse("text/plain"), skey)
+        val requestBodyFile_address_aws: RequestBody = RequestBody.create(MediaType.parse("text/plain"), file_address_aws)
         val xmzAlgorithm: RequestBody =
             RequestBody.create(MediaType.parse("text/plain"), sxmzAlgorithm)
         val xmzCredential: RequestBody =
@@ -218,10 +218,11 @@ class UploadImageActivity : AppCompatActivity() {
             RequestBody.create(MediaType.parse("text/plain"), sxmzSignature)
         val file: RequestBody = RequestBody.create(MediaType.parse("image/*"), sfile)
 
-
+        val progress_bar: ProgressBar = findViewById(R.id.progress_bar)
+        progress_bar.progress = 0
         val call = ImageService.imageInstance.sendToAws(
             url = url,
-            file_name = key,
+            key = requestBodyFile_address_aws,
             algorithm = xmzAlgorithm,
             credential = xmzCredential,
             date = xmzDate,
@@ -229,6 +230,7 @@ class UploadImageActivity : AppCompatActivity() {
             signature = xmzSignature,
             file = file
         )
+        Log.i("key",file_address_aws)
 
         val gson = Gson()
 
@@ -255,20 +257,23 @@ class UploadImageActivity : AppCompatActivity() {
                     ).show()
                     return
                 } else if (response.code() == 204) {
-                    saveImageDetails(rent_id,skey,loadJWTTokenData())
+                    saveImageDetails(rent_id,file_address_aws,loadJWTTokenData())
+                    progress_bar.progress = 100
                     return
                 }
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
+                progress_bar.progress = 0
                 Log.d("failure", "Error in failure", t)
             }
-
         })
     }
 
-    private fun saveImageDetails(rent_id: String,file_name: String,token: String?) {
-        val image_details = UploadImageRequest(rent_id, file_name)
+    private fun saveImageDetails(rent_id: String,file_address_aws: String,token: String?) {
+        val image_details = UploadImageRequest(rent_id, file_address_aws)
+        Log.i("rent_id",rent_id)
+        Log.i("file_address_aws",file_address_aws)
         val call = ImageService.imageInstance.saveImageDetails(image_details,token = "Bearer $token")
         //val intent = Intent(this, RegisterActivity::class.java)
         val gson = Gson()
