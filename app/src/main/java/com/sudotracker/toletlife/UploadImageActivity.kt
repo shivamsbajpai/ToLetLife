@@ -346,13 +346,20 @@ class UploadImageActivity : AppCompatActivity() {
     }
 
     private fun setBottomNavigationBarProperties(){
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.upload_image_bottomNavigationView)
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
         bottomNavigationView.background = null
+        bottomNavigationView.selectedItemId = R.id.placeholder
         bottomNavigationView.menu.getItem(2).isEnabled = false
-        val fab: FloatingActionButton = findViewById(R.id.upload_image_fab)
+        val fab: FloatingActionButton = findViewById(R.id.fab)
 
         bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
             val intent = Intent(this, RentalOptions::class.java)
+            startActivity(intent)
+            finish()
+            return@setOnMenuItemClickListener true
+        }
+        bottomNavigationView.menu.getItem(1).setOnMenuItemClickListener {
+            val intent = Intent(this, SearchRentDetails::class.java)
             startActivity(intent)
             finish()
             return@setOnMenuItemClickListener true
@@ -368,8 +375,7 @@ class UploadImageActivity : AppCompatActivity() {
 
 
         fab.setOnClickListener{
-            val intent = Intent(this, CreateRentActivity::class.java)
-            //intent.putExtra("rent_id", "c6b0a47d-d01b-46ac-a5d9-557ef5fc1b6c")
+            val intent = Intent(this, CreateProductActivity::class.java)
             startActivity(intent)
             finish()
         }

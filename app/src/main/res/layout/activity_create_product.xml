@@ -7,9 +7,10 @@
     android:gravity="top"
     android:background="@color/background_color"
     android:orientation="vertical"
-    tools:context=".CreateRentActivity">
+    tools:context=".CreateProductActivity">
+
     <ProgressBar
-        android:id="@+id/create_rent_activity_circular_progress_load"
+        android:id="@+id/create_product_activity_circular_progress_load"
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +19,7 @@
         />
 
     <TextView
-        android:id="@+id/tv_create_rent_activity_app_name"
+        android:id="@+id/tv_create_product_activity_app_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -26,7 +27,7 @@
         android:fontFamily="@font/bree_serif"
         android:layout_alignParentTop="true"
         android:gravity="center"
-        android:text="Rent your happy place"
+        android:text="Rent your product"
         android:textColor="@color/tolet_logo"
         android:textSize="30sp"
         android:textStyle="bold" />
@@ -36,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_below="@+id/tv_create_rent_activity_app_name"
+        android:layout_below="@+id/tv_create_product_activity_app_name"
         android:layout_marginTop="10dp"
         app:cardBackgroundColor="@color/background_color"
         app:cardCornerRadius="15dp"
@@ -49,8 +50,26 @@
             android:padding="16dp">
 
             <EditText
-                android:id="@+id/et_create_rent_city"
-                android:hint="City"
+                android:id="@+id/et_create_product"
+                android:hint="Product"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:textSize="20sp"
+                android:textColor="@color/input_text_color"
+                android:backgroundTint="@color/edit_text_color"
+                android:textColorHint="@color/input_text_color" />
+            <Spinner
+                android:id="@+id/spinner_create_product"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:popupBackground="@color/background_color"
+                android:spinnerMode="dropdown"/>
+            <EditText
+                android:id="@+id/et_create_product_description"
+                android:hint="Product Description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -60,30 +79,8 @@
                 android:backgroundTint="@color/edit_text_color"
                 android:textColorHint="@color/input_text_color" />
             <EditText
-                android:id="@+id/et_create_rent_area"
-                android:hint="Area"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text=""
-                android:textSize="20sp"
-                android:textColor="@color/input_text_color"
-                android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
-            <EditText
-                android:id="@+id/et_create_rent_address"
-                android:hint="Address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text=""
-                android:textSize="20sp"
-                android:textColor="@color/input_text_color"
-                android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
-            <EditText
-                android:id="@+id/et_create_rent_pincode"
-                android:hint="Pincode"
+                android:id="@+id/et_create_product_security_deposit"
+                android:hint="Security Deposit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -94,12 +91,13 @@
                 android:backgroundTint="@color/edit_text_color"
                 android:textColorHint="@color/input_text_color" />
             <EditText
-                android:id="@+id/et_create_rent_state"
-                android:hint="State"
+                android:id="@+id/et_create_product_monthly_rent"
+                android:hint="Monthly Rent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text=""
+                android:inputType="number"
                 android:textSize="20sp"
                 android:textColor="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
@@ -114,11 +112,11 @@
                 />
             <Button
                 style="?android:attr/borderlessButtonStyle"
-                android:id="@+id/btn_create_rent_upload_images"
+                android:id="@+id/btn_create_product"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Upload Images"
+                android:text="Add Address"
                 android:textSize="18sp"
                 android:textColor="@android:color/white"
                 app:backgroundTint="@color/button_color"

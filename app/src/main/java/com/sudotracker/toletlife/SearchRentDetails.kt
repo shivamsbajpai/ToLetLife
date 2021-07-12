@@ -41,13 +41,14 @@ class SearchRentDetails : AppCompatActivity() {
         newRecyclerview.setHasFixedSize(true)
 
         newArrayList = ArrayList<UserAllRentDetailsItem>()
-        Log.i("very different",search_term.toString())
+        Log.i("very different", search_term.toString())
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 newArrayList = ArrayList<UserAllRentDetailsItem>()
-                search(query)
+                search_by_product(query)
                 return false
             }
+
             override fun onQueryTextChange(newText: String): Boolean {
 
                 return false
@@ -61,16 +62,20 @@ class SearchRentDetails : AppCompatActivity() {
         for (i in response.indices) {
             val userAllRentDetailsItem =
                 UserAllRentDetailsItem(
-                    response[i].address,
-                    response[i].area,
-                    response[i].city,
-                    response[i].imageUrls,
-                    response[i].monthlyRent,
-                    response[i].pincode,
-                    response[i].rentId,
-                    response[i].state,
-                    response[i].statusId,
-                    response[i].userId
+                    rentId = response[i].rentId,
+                    userId = response[i].userId,
+                    productName = response[i].productName,
+                    productCategoryId = response[i].productCategoryId,
+                    productDescription = response[i].productDescription,
+                    securityDeposit = response[i].securityDeposit,
+                    monthlyRent = response[i].monthlyRent,
+                    address = response[i].address,
+                    area = response[i].area,
+                    city = response[i].city,
+                    state = response[i].state,
+                    statusId = response[i].statusId,
+                    pincode = response[i].pincode,
+                    imageUrls = response[i].imageUrls
                 )
             newArrayList.add(userAllRentDetailsItem)
         }
@@ -90,11 +95,14 @@ class SearchRentDetails : AppCompatActivity() {
         })
     }
 
-    private fun search(search_term: String) {
+    private fun search_by_product(search_term: String) {
         progressBarVisibility(true)
         val jwtToken = loadJWTTokenData()
         val call =
-            RentDetailsService.rentDetailsInstance.search(search_term = search_term,token = "Bearer $jwtToken")
+            RentDetailsService.rentDetailsInstance.search_by_product(
+                product_search_term = search_term,
+                token = "Bearer $jwtToken"
+            )
         val gson = Gson()
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
@@ -122,6 +130,12 @@ class SearchRentDetails : AppCompatActivity() {
                     val jsonResponse = gson.toJson(response.body())
                     val resp: UserAllRentDetails =
                         gson.fromJson(jsonResponse, UserAllRentDetails::class.java)
+                    if (resp.isEmpty()) {
+                        Toast.makeText(this@SearchRentDetails, "Not found", Toast.LENGTH_LONG)
+                            .show()
+                        progressBarVisibility(false)
+                        return
+                    }
                     getUserdata(resp)
                     return
                 }
@@ -153,11 +167,13 @@ class SearchRentDetails : AppCompatActivity() {
             putString("JWT_TOKEN", token)
         }.apply()
     }
+
     private fun setBottomNavigationBarProperties() {
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.search_bottomNavigationView)
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
         bottomNavigationView.background = null
+        bottomNavigationView.selectedItemId = R.id.menu_search
         bottomNavigationView.menu.getItem(2).isEnabled = false
-        val fab: FloatingActionButton = findViewById(R.id.search_fab)
+        val fab: FloatingActionButton = findViewById(R.id.fab)
 
         bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
             val intent = Intent(this, RentalOptions::class.java)
@@ -166,9 +182,6 @@ class SearchRentDetails : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
         bottomNavigationView.menu.getItem(1).setOnMenuItemClickListener {
-            val intent = Intent(this, SearchRentDetails::class.java)
-            startActivity(intent)
-            finish()
             return@setOnMenuItemClickListener true
         }
 
@@ -182,8 +195,7 @@ class SearchRentDetails : AppCompatActivity() {
 
 
         fab.setOnClickListener {
-            val intent = Intent(this, CreateRentActivity::class.java)
-            //intent.putExtra("rent_id", "c6b0a47d-d01b-46ac-a5d9-557ef5fc1b6c")
+            val intent = Intent(this, CreateProductActivity::class.java)
             startActivity(intent)
             finish()
         }

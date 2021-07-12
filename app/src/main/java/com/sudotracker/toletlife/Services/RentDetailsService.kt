@@ -13,9 +13,15 @@ interface RentDetailsInterface {
     ): Call<Any>
 
 
-    @GET("rentdetails/search")
-    fun search(
-        @Query("search_term") search_term: String,
+    @GET("rentdetails/searchbyaddress")
+    fun search_by_address(
+        @Query("search_term") address_search_term: String,
+        @Header("Authorization") token: String
+    ): Call<Any>
+
+    @GET("rentdetails/searchbyproduct")
+    fun search_by_product(
+        @Query("search_term") product_search_term: String,
         @Header("Authorization") token: String
     ): Call<Any>
 

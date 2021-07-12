@@ -38,22 +38,41 @@ class CreateRentActivity : AppCompatActivity() {
         val et_create_rent_address: EditText = findViewById(R.id.et_create_rent_address)
         val et_create_rent_area: EditText = findViewById(R.id.et_create_rent_area)
         val et_create_rent_city: EditText = findViewById(R.id.et_create_rent_city)
-        val et_create_rent_monthly_rent: EditText = findViewById(R.id.et_create_rent_monthly_rent)
         val et_create_rent_pincode: EditText = findViewById(R.id.et_create_rent_pincode)
         val et_create_rent_state: EditText = findViewById(R.id.et_create_rent_state)
+
+        //intent values
+        val product_name = intent.getStringExtra("product_name").toString()
+        val product_category = intent.getStringExtra("product_category").toString()
+        val product_description = intent.getStringExtra("product_description").toString()
+        val security_deposit = intent.getStringExtra("security_deposit").toString()
+        val monthly_rent = intent.getStringExtra("monthly_rent").toString()
+        val statusId = "3cb9559b-fe39-4e6b-9f58-25ed7c18003f"
+
 
         btn_create_rent_upload_images.setOnClickListener {
             val address = et_create_rent_address.text.toString()
             val area = et_create_rent_area.text.toString()
             val city = et_create_rent_city.text.toString()
-            val monthly_rent = et_create_rent_monthly_rent.text.toString()
             val pincode = et_create_rent_pincode.text.toString()
             val state = et_create_rent_state.text.toString()
-            if (address == "" || area == "" || city == "" || monthly_rent == "" || pincode == "" || state == "") {
+            if (address == "" || area == "" || city == "" || pincode == "" || state == "") {
                 Toast.makeText(this, "Fields should not be empty", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-            userCreateRent(address,area,city,monthly_rent.toInt(),pincode,state)
+            userCreateRent(
+                product_name = product_name,
+                product_category = product_category,
+                product_description = product_description,
+                security_deposit = security_deposit,
+                monthly_rent = monthly_rent,
+                pincode = pincode,
+                address = address,
+                area = area,
+                city = city,
+                state = state,
+                status_id = statusId
+            )
         }
     }
 
@@ -69,17 +88,34 @@ class CreateRentActivity : AppCompatActivity() {
     }
 
     private fun userCreateRent(
+        product_name: String,
+        product_category: String,
+        product_description: String,
+        security_deposit: String,
+        monthly_rent: String,
+        pincode: String,
         address: String,
         area: String,
         city: String,
-        monthlyRent: Int,
-        pincode: String,
-        state: String
+        state: String,
+        status_id: String
     ) {
-        val statusId = "3cb9559b-fe39-4e6b-9f58-25ed7c18003f"
-        val createRent = UserCreateRentRequest(address,area,city,monthlyRent,pincode,state,statusId)
+
+        val createRent = UserCreateRentRequest(
+            productName = product_name,
+            productCategoryId = product_category,
+            productDescription = product_description,
+            securityDeposit = security_deposit,
+            monthlyRent = monthly_rent,
+            pincode = pincode,
+            address = address,
+            area = area,
+            city = city,
+            state = state,
+            statusId = status_id
+        )
         val jwtToken = loadJWTTokenData()
-        val call = UserRentService.userRentInstance.userCreateRent(createRent,"Bearer $jwtToken")
+        val call = UserRentService.userRentInstance.userCreateRent(createRent, "Bearer $jwtToken")
         val intent = Intent(this, UploadImageActivity::class.java)
         val gson = Gson()
         progressBarVisibility(true)
@@ -111,7 +147,8 @@ class CreateRentActivity : AppCompatActivity() {
                     progressBarVisibility(false)
                     intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                     val jsonResponse = gson.toJson(response.body())
-                    val resp: UserCreateRentResponse = gson.fromJson(jsonResponse, UserCreateRentResponse::class.java)
+                    val resp: UserCreateRentResponse =
+                        gson.fromJson(jsonResponse, UserCreateRentResponse::class.java)
                     intent.putExtra("rent_id", resp.rentId)
                     startActivity(intent)
                     finish()
@@ -139,6 +176,7 @@ class CreateRentActivity : AppCompatActivity() {
             progress.visibility = View.GONE
         }
     }
+
     private fun loadJWTTokenData(): String? {
         val sharedPreferences = getSharedPreferences("jwtToken", Context.MODE_PRIVATE)
         return sharedPreferences.getString("JWT_TOKEN", null)
@@ -152,11 +190,13 @@ class CreateRentActivity : AppCompatActivity() {
         }.apply()
     }
 
-    private fun setBottomNavigationBarProperties(){
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.create_rent_bottomNavigationView)
+    private fun setBottomNavigationBarProperties() {
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
         bottomNavigationView.background = null
+        bottomNavigationView.selectedItemId = R.id.fab
+        bottomNavigationView.selectedItemId = R.id.placeholder
         bottomNavigationView.menu.getItem(2).isEnabled = false
-        val fab: FloatingActionButton = findViewById(R.id.create_rent_fab)
+        val fab: FloatingActionButton = findViewById(R.id.fab)
 
         bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
             val intent = Intent(this, RentalOptions::class.java)
@@ -164,7 +204,12 @@ class CreateRentActivity : AppCompatActivity() {
             finish()
             return@setOnMenuItemClickListener true
         }
-
+        bottomNavigationView.menu.getItem(1).setOnMenuItemClickListener {
+            val intent = Intent(this, SearchRentDetails::class.java)
+            startActivity(intent)
+            finish()
+            return@setOnMenuItemClickListener true
+        }
         bottomNavigationView.menu.getItem(4).setOnMenuItemClickListener {
             saveToken(null)
             val intent = Intent(this, MainActivity::class.java)
@@ -174,9 +219,8 @@ class CreateRentActivity : AppCompatActivity() {
         }
 
 
-        fab.setOnClickListener{
-            val intent = Intent(this, CreateRentActivity::class.java)
-            //intent.putExtra("rent_id", "c6b0a47d-d01b-46ac-a5d9-557ef5fc1b6c")
+        fab.setOnClickListener {
+            val intent = Intent(this, CreateProductActivity::class.java)
             startActivity(intent)
             finish()
         }

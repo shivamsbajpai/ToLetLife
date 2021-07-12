@@ -23,7 +23,9 @@ import com.sudotracker.toletlife.Requests.LoginRequest
 import com.sudotracker.toletlife.Requests.OtpRequest
 import com.sudotracker.toletlife.Responses.LoginResponse
 import com.sudotracker.toletlife.Responses.OtpResponse
+import com.sudotracker.toletlife.Responses.ProductCategoryResponse
 import com.sudotracker.toletlife.Services.IdentityService
+import com.sudotracker.toletlife.Services.ProductCategoryService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -53,9 +55,7 @@ class MainActivity : AppCompatActivity() {
         val jwtToken = loadJWTTokenData()
 
         if (jwtToken != null) {
-            val intent = Intent(this, RentalOptions::class.java)
-            startActivity(intent)
-            finish()
+            getProductCategories()
         }
 
         et_send_otp_email.setOnKeyListener(View.OnKeyListener { _, keyCode, event ->
@@ -174,7 +174,6 @@ class MainActivity : AppCompatActivity() {
     private fun sendLogin(email: String, password: String) {
         val loginRequest = LoginRequest(email, password)
         val call = IdentityService.identityInstance.sendLogin(loginRequest)
-        val intent = Intent(this, RentalOptions::class.java)
         val gson = Gson()
         progressBarVisibility(true)
         call.enqueue(object : Callback<Any> {
@@ -202,14 +201,10 @@ class MainActivity : AppCompatActivity() {
                     progressBarVisibility(false)
                     return
                 } else if (response.code() == 200) {
-                    progressBarVisibility(false)
                     val jsonResponse = gson.toJson(response.body())
                     val resp: LoginResponse = gson.fromJson(jsonResponse, LoginResponse::class.java)
                     saveToken(resp.token)
-                    intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    Toast.makeText(this@MainActivity, "Login Successful", Toast.LENGTH_LONG).show()
-                    startActivity(intent)
-                    finish()
+                    getProductCategories()
                     return
                 } else {
                     progressBarVisibility(false)
@@ -255,5 +250,66 @@ class MainActivity : AppCompatActivity() {
         } else {
             progress.visibility = View.GONE
         }
+    }
+
+    private fun getProductCategories(){
+        progressBarVisibility(true)
+        val jwtToken = loadJWTTokenData()
+        val call =
+            ProductCategoryService.productCategoryInstance.getAllproductCategories(token = "Bearer $jwtToken")
+        val gson = Gson()
+        val intent = Intent(this, RentalOptions::class.java)
+        call.enqueue(object : Callback<Any> {
+            override fun onResponse(call: Call<Any>, response: Response<Any>) {
+                if (response.code() == 422) {
+                    val type = object : TypeToken<ValidationErrorResponse>() {}.type
+                    val errorResponse: ValidationErrorResponse? =
+                        gson.fromJson(response.errorBody()?.charStream(), type)
+                    Toast.makeText(
+                        this@MainActivity,
+                        errorResponse?.detail?.first()?.msg.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                } else if (response.code() > 399) {
+                    val type = object : TypeToken<ErrorResponse>() {}.type
+                    val errorResponse: ErrorResponse? =
+                        gson.fromJson(response.errorBody()?.charStream(), type)
+                    Toast.makeText(
+                        this@MainActivity,
+                        errorResponse?.detail.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                } else if (response.code() == 200) {
+                    val jsonResponse = gson.toJson(response.body())
+                    Log.i("response",jsonResponse)
+                    saveProductCategories(jsonResponse)
+                    progressBarVisibility(false)
+                    intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    Toast.makeText(this@MainActivity, "Login Successful", Toast.LENGTH_LONG).show()
+                    startActivity(intent)
+                    finish()
+                    return
+                }
+            }
+
+            override fun onFailure(call: Call<Any>, t: Throwable) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Could not connect to internet. Please try again.",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.d("failure", "Error in failure", t)
+            }
+        })
+    }
+
+    private fun saveProductCategories(response: String) {
+        val sharedPreferences = getSharedPreferences("productCategories", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.apply {
+            putString("productCategories",response)
+        }.apply()
     }
 }

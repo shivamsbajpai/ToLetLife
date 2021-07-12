@@ -34,32 +34,6 @@ class RentalOptions : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rental_options)
         setBottomNavigationBarProperties()
-//
-//        imageId = arrayOf(
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle,
-//            R.drawable.bg_triangle
-//        )
-
-//        heading = arrayOf(
-//            "Argentina",
-//            "Australia",
-//            "Belgium",
-//            "Denmark",
-//            "Brazil",
-//            "Fiji",
-//            "Germany",
-//            "India",
-//            "Kuwait",
-//            "New Zealand"
-//        )
 
         newRecyclerview = findViewById(R.id.rv_rentalOptions)
         newRecyclerview.layoutManager = LinearLayoutManager(this)
@@ -75,16 +49,20 @@ class RentalOptions : AppCompatActivity() {
         for (i in response.indices) {
             val userAllRentDetailsItem =
                 UserAllRentDetailsItem(
-                    response[i].address,
-                    response[i].area,
-                    response[i].city,
-                    response[i].imageUrls,
-                    response[i].monthlyRent,
-                    response[i].pincode,
-                    response[i].rentId,
-                    response[i].state,
-                    response[i].statusId,
-                    response[i].userId
+                    rentId = response[i].rentId,
+                    userId = response[i].userId,
+                    productName = response[i].productName,
+                    productCategoryId = response[i].productCategoryId,
+                    productDescription = response[i].productDescription,
+                    securityDeposit = response[i].securityDeposit,
+                    monthlyRent = response[i].monthlyRent,
+                    address = response[i].address,
+                    area = response[i].area,
+                    city = response[i].city,
+                    state = response[i].state,
+                    statusId = response[i].statusId,
+                    pincode = response[i].pincode,
+                    imageUrls = response[i].imageUrls
                 )
             newArrayList.add(userAllRentDetailsItem)
         }
@@ -170,13 +148,11 @@ class RentalOptions : AppCompatActivity() {
     private fun setBottomNavigationBarProperties() {
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottomNavigationView)
         bottomNavigationView.background = null
+        bottomNavigationView.selectedItemId = R.id.menu_home
         bottomNavigationView.menu.getItem(2).isEnabled = false
         val fab: FloatingActionButton = findViewById(R.id.fab)
 
         bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            val intent = Intent(this, RentalOptions::class.java)
-            startActivity(intent)
-            finish()
             return@setOnMenuItemClickListener true
         }
         bottomNavigationView.menu.getItem(1).setOnMenuItemClickListener {
@@ -196,7 +172,7 @@ class RentalOptions : AppCompatActivity() {
 
 
         fab.setOnClickListener {
-            val intent = Intent(this, CreateRentActivity::class.java)
+            val intent = Intent(this, CreateProductActivity::class.java)
             //intent.putExtra("rent_id", "c6b0a47d-d01b-46ac-a5d9-557ef5fc1b6c")
             startActivity(intent)
             finish()
