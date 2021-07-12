@@ -57,7 +57,7 @@
                 android:textSize="20sp"
                 android:textColor="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
+                android:textColorHint="@color/input_hint_color" />
             <EditText
                 android:id="@+id/et_login_password"
                 android:layout_width="match_parent"
@@ -65,7 +65,7 @@
                 android:inputType="textPassword"
                 android:textSize="20sp"
                 android:hint="Password"
-                android:textColorHint="@color/input_text_color"
+                android:textColorHint="@color/input_hint_color"
                 android:backgroundTint="@color/edit_text_color"
                 android:textColor="@color/input_text_color"
                 android:text="" />
@@ -129,7 +129,7 @@
                 android:hint="Email"
                 android:inputType="text"
                 android:imeOptions="actionDone"
-                android:textColorHint="@color/input_text_color"
+                android:textColorHint="@color/input_hint_color"
                 android:backgroundTint="@color/edit_text_color"
                 android:textColor="@color/input_text_color"
                 android:text="" />

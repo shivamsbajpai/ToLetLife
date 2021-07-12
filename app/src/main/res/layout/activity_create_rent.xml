@@ -26,7 +26,7 @@
         android:fontFamily="@font/bree_serif"
         android:layout_alignParentTop="true"
         android:gravity="center"
-        android:text="Rent your happy place"
+        android:text="Contact Address"
         android:textColor="@color/tolet_logo"
         android:textSize="30sp"
         android:textStyle="bold" />
@@ -58,7 +58,7 @@
                 android:textSize="20sp"
                 android:textColor="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
+                android:textColorHint="@color/input_hint_color" />
             <EditText
                 android:id="@+id/et_create_rent_area"
                 android:hint="Area"
@@ -69,7 +69,7 @@
                 android:textSize="20sp"
                 android:textColor="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
+                android:textColorHint="@color/input_hint_color" />
             <EditText
                 android:id="@+id/et_create_rent_address"
                 android:hint="Address"
@@ -80,7 +80,7 @@
                 android:textSize="20sp"
                 android:textColor="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
+                android:textColorHint="@color/input_hint_color" />
             <EditText
                 android:id="@+id/et_create_rent_pincode"
                 android:hint="Pincode"
@@ -92,7 +92,7 @@
                 android:inputType="number"
                 android:textColor="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
+                android:textColorHint="@color/input_hint_color" />
             <EditText
                 android:id="@+id/et_create_rent_state"
                 android:hint="State"
@@ -103,7 +103,7 @@
                 android:textSize="20sp"
                 android:textColor="@color/input_text_color"
                 android:backgroundTint="@color/edit_text_color"
-                android:textColorHint="@color/input_text_color" />
+                android:textColorHint="@color/input_hint_color" />
             <TextView
                 android:id="@+id/tv_create_rent_error"
                 android:layout_width="match_parent"
@@ -118,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Upload Images"
+                android:text="Add Address"
                 android:textSize="18sp"
                 android:textColor="@android:color/white"
                 app:backgroundTint="@color/button_color"

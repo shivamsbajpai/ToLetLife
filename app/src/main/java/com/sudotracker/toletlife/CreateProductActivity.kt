@@ -63,7 +63,7 @@ class CreateProductActivity : AppCompatActivity() {
         arrayAdapter.setDropDownViewResource(R.layout.spinner_item)
         var selectedText = ""
         spinner.adapter = arrayAdapter
-        spinner.setSelection(0)
+        spinner.setSelection(1)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
