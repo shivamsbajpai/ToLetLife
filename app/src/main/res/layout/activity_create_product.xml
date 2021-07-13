@@ -27,7 +27,7 @@
         android:fontFamily="@font/bree_serif"
         android:layout_alignParentTop="true"
         android:gravity="center"
-        android:text="Rent your product"
+        android:text="Rent out your product"
         android:textColor="@color/tolet_logo"
         android:textSize="30sp"
         android:textStyle="bold" />

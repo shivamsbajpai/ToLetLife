@@ -1,5 +1,6 @@
 package com.sudotracker.toletlife
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,9 +8,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.gson.Gson
+import com.sudotracker.toletlife.Responses.ProductCategoryResponse
 import com.sudotracker.toletlife.Responses.UserAllRentDetailsItem
 
-class RvAdapter(private val rentList: ArrayList<UserAllRentDetailsItem>) :
+class RvAdapter(
+    private val rentList: ArrayList<UserAllRentDetailsItem>,
+    private val productCategories: Map<String, String>
+) :
     RecyclerView.Adapter<RvAdapter.RvViewHolder>() {
 
     private lateinit var mListener: onItemClickListener
@@ -31,13 +37,19 @@ class RvAdapter(private val rentList: ArrayList<UserAllRentDetailsItem>) :
 
     override fun onBindViewHolder(holder: RvViewHolder, position: Int) {
         val currentItem = rentList[position]
-        val imageUrl = currentItem.imageUrls[0].imageUrl
+        var imageUrl: String = ""
+        if(currentItem.imageUrls.isNotEmpty()){
+            imageUrl = currentItem.imageUrls[0].imageUrl
+        }
+
+
         Glide.with(holder.titleImage).load(imageUrl).centerCrop()
             .placeholder(R.drawable.bg_triangle)
             .into(holder.titleImage)
-        holder.tvHeading.text = "City: ${currentItem.city}"
-        holder.tvArea.text = "Area: ${currentItem.area}"
-        holder.tvRent.text = "Rent: Rs. ${currentItem.monthlyRent}/month"
+        holder.tvProduct.text = currentItem.productName
+        holder.tvCategory.text = productCategories[currentItem.productCategoryId]
+        holder.tvRent.text = currentItem.monthlyRent
+        holder.tvCity.text = currentItem.city
 
     }
 
@@ -49,9 +61,10 @@ class RvAdapter(private val rentList: ArrayList<UserAllRentDetailsItem>) :
     class RvViewHolder(itemView: View, listener: onItemClickListener) :
         RecyclerView.ViewHolder(itemView) {
         val titleImage: ShapeableImageView = itemView.findViewById(R.id.title_image)
-        val tvHeading: TextView = itemView.findViewById(R.id.tvHeading)
-        val tvArea: TextView = itemView.findViewById(R.id.tvArea)
+        val tvProduct: TextView = itemView.findViewById(R.id.tvProduct)
+        val tvCategory: TextView = itemView.findViewById(R.id.tvCategory)
         val tvRent: TextView = itemView.findViewById(R.id.tvRent)
+        val tvCity: TextView = itemView.findViewById(R.id.tvCity)
 
         init {
             itemView.setOnClickListener {

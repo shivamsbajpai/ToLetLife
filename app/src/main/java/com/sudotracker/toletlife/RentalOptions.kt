@@ -6,8 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -16,6 +15,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sudotracker.toletlife.Error.ErrorResponse
 import com.sudotracker.toletlife.Error.ValidationErrorResponse
+import com.sudotracker.toletlife.Responses.ProductCategoryResponse
 import com.sudotracker.toletlife.Responses.UserAllRentDetails
 import com.sudotracker.toletlife.Responses.UserAllRentDetailsItem
 import com.sudotracker.toletlife.Services.RentDetailsService
@@ -27,8 +27,6 @@ class RentalOptions : AppCompatActivity() {
 
     private lateinit var newRecyclerview: RecyclerView
     private lateinit var newArrayList: ArrayList<UserAllRentDetailsItem>
-    lateinit var imageId: Array<Int>
-    lateinit var heading: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,9 +40,46 @@ class RentalOptions : AppCompatActivity() {
         newArrayList = ArrayList<UserAllRentDetailsItem>()
         getAllRentDetails()
 
+        val searchView: SearchView = findViewById(R.id.search_view_rental_options)
+        val search_term = searchView.query
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                newArrayList = ArrayList<UserAllRentDetailsItem>()
+                search_by_address(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+
+                return false
+            }
+        })
+
+        val closeButtonId: Int =
+            searchView.context.resources.getIdentifier("android:id/search_close_btn", null, null)
+        val closeButton = searchView.findViewById(closeButtonId) as ImageView
+
+
+        closeButton.setOnClickListener {
+            searchView.setQuery("", false)
+            newArrayList = ArrayList<UserAllRentDetailsItem>()
+            getAllRentDetails()
+        }
+
     }
 
-    private fun getUserdata(response: UserAllRentDetails) {
+    private fun getUserRentData(response: UserAllRentDetails) {
+        val productCategoriesString = loadProductCategories()
+        val gson = Gson()
+        val productCategories: ProductCategoryResponse =
+            gson.fromJson(productCategoriesString, ProductCategoryResponse::class.java)
+
+        var productCategoryMap = mutableMapOf<String, String>()
+
+        for (item in productCategories) {
+            productCategoryMap[item.productCategoryId] = item.productCategory
+        }
 
         for (i in response.indices) {
             val userAllRentDetailsItem =
@@ -66,17 +101,17 @@ class RentalOptions : AppCompatActivity() {
                 )
             newArrayList.add(userAllRentDetailsItem)
         }
-        var adapter = RvAdapter(newArrayList)
+        var adapter = RvAdapter(newArrayList, productCategoryMap)
         newRecyclerview.adapter = adapter
         progressBarVisibility(false)
 
         adapter.setOnItemClickListener(object : RvAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
-                Toast.makeText(
-                    this@RentalOptions,
-                    "You clicked on item no. $position",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val gson = Gson()
+                val jsonResponse = gson.toJson(newArrayList[position])
+                val intent = Intent(this@RentalOptions, ProductDetailsActivity::class.java)
+                intent.putExtra("productDetails",jsonResponse)
+                startActivity(intent)
             }
 
         })
@@ -114,7 +149,7 @@ class RentalOptions : AppCompatActivity() {
                     val jsonResponse = gson.toJson(response.body())
                     val resp: UserAllRentDetails =
                         gson.fromJson(jsonResponse, UserAllRentDetails::class.java)
-                    getUserdata(resp)
+                    getUserRentData(resp)
                     return
                 }
             }
@@ -130,6 +165,70 @@ class RentalOptions : AppCompatActivity() {
 
         })
 
+    }
+
+    private fun search_by_address(search_term: String) {
+        progressBarVisibility(true)
+        val jwtToken = loadJWTTokenData()
+        val call =
+            RentDetailsService.rentDetailsInstance.search_by_address(
+                address_search_term = search_term,
+                token = "Bearer $jwtToken"
+            )
+        val gson = Gson()
+        call.enqueue(object : Callback<Any> {
+            override fun onResponse(call: Call<Any>, response: Response<Any>) {
+                if (response.code() == 422) {
+                    val type = object : TypeToken<ValidationErrorResponse>() {}.type
+                    val errorResponse: ValidationErrorResponse? =
+                        gson.fromJson(response.errorBody()?.charStream(), type)
+                    Toast.makeText(
+                        this@RentalOptions,
+                        errorResponse?.detail?.first()?.msg.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                } else if (response.code() > 399) {
+                    val type = object : TypeToken<ErrorResponse>() {}.type
+                    val errorResponse: ErrorResponse? =
+                        gson.fromJson(response.errorBody()?.charStream(), type)
+                    Toast.makeText(
+                        this@RentalOptions,
+                        errorResponse?.detail.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                } else if (response.code() == 200) {
+                    val jsonResponse = gson.toJson(response.body())
+                    val resp: UserAllRentDetails =
+                        gson.fromJson(jsonResponse, UserAllRentDetails::class.java)
+                    if (resp.isEmpty()) {
+                        Toast.makeText(this@RentalOptions, "Not found", Toast.LENGTH_LONG)
+                            .show()
+                        progressBarVisibility(false)
+                        return
+                    }
+                    getUserRentData(resp)
+                    return
+                }
+            }
+
+            override fun onFailure(call: Call<Any>, t: Throwable) {
+                Toast.makeText(
+                    this@RentalOptions,
+                    "Could not connect to internet. Please try again.",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.d("failure", "Error in failure", t)
+            }
+
+        })
+
+    }
+
+    private fun loadProductCategories(): String? {
+        val sharedPreferences = getSharedPreferences("productCategories", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("productCategories", null)
     }
 
     private fun loadJWTTokenData(): String? {
@@ -173,7 +272,6 @@ class RentalOptions : AppCompatActivity() {
 
         fab.setOnClickListener {
             val intent = Intent(this, CreateProductActivity::class.java)
-            //intent.putExtra("rent_id", "c6b0a47d-d01b-46ac-a5d9-557ef5fc1b6c")
             startActivity(intent)
             finish()
         }

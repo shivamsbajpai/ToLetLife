@@ -17,6 +17,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sudotracker.toletlife.Error.ErrorResponse
 import com.sudotracker.toletlife.Error.ValidationErrorResponse
+import com.sudotracker.toletlife.Responses.ProductCategoryResponse
 import com.sudotracker.toletlife.Responses.UserAllRentDetails
 import com.sudotracker.toletlife.Responses.UserAllRentDetailsItem
 import com.sudotracker.toletlife.Services.RentDetailsService
@@ -42,6 +43,7 @@ class SearchRentDetails : AppCompatActivity() {
 
         newArrayList = ArrayList<UserAllRentDetailsItem>()
         Log.i("very different", search_term.toString())
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 newArrayList = ArrayList<UserAllRentDetailsItem>()
@@ -58,6 +60,16 @@ class SearchRentDetails : AppCompatActivity() {
     }
 
     private fun getUserdata(response: UserAllRentDetails) {
+        val productCategoriesString = loadProductCategories()
+        val gson = Gson()
+        val productCategories: ProductCategoryResponse =
+            gson.fromJson(productCategoriesString, ProductCategoryResponse::class.java)
+
+        var productCategoryMap = mutableMapOf<String, String>()
+
+        for (item in productCategories) {
+            productCategoryMap[item.productCategoryId] = item.productCategory
+        }
 
         for (i in response.indices) {
             val userAllRentDetailsItem =
@@ -79,17 +91,17 @@ class SearchRentDetails : AppCompatActivity() {
                 )
             newArrayList.add(userAllRentDetailsItem)
         }
-        var adapter = RvAdapter(newArrayList)
+        var adapter = RvAdapter(newArrayList,productCategoryMap)
         newRecyclerview.adapter = adapter
         progressBarVisibility(false)
 
         adapter.setOnItemClickListener(object : RvAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
-                Toast.makeText(
-                    this@SearchRentDetails,
-                    "You clicked on item no. $position",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val gson = Gson()
+                val jsonResponse = gson.toJson(newArrayList[position])
+                val intent = Intent(this@SearchRentDetails, ProductDetailsActivity::class.java)
+                intent.putExtra("productDetails",jsonResponse)
+                startActivity(intent)
             }
 
         })
@@ -152,6 +164,11 @@ class SearchRentDetails : AppCompatActivity() {
 
         })
 
+    }
+
+    private fun loadProductCategories(): String? {
+        val sharedPreferences = getSharedPreferences("productCategories", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("productCategories", null)
     }
 
 
