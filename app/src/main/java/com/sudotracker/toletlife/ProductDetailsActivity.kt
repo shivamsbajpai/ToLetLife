@@ -36,7 +36,7 @@ class ProductDetailsActivity : AppCompatActivity() {
         var productCategoryMap = mutableMapOf<String,String>()
 
         for(item in productCategories){
-            productCategoryMap[item.productCategory] = item.productCategoryId
+            productCategoryMap[item.productCategoryId] = item.productCategory
         }
 
 
