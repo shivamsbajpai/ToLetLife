@@ -11,7 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-const val BASE_URL = "https://toletlife.herokuapp.com/api/v1/"
+const val BASE_URL = "https://toletlife.azurewebsites.net/api/v1/"
 interface IdentityInterface{
     @POST("identity/sendotp")
     fun sendOtp(@Body otpRequest: OtpRequest):Call<Any>

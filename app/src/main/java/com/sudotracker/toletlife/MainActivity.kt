@@ -69,7 +69,6 @@ class MainActivity : AppCompatActivity() {
 
         btn_login.setOnClickListener {
             val email = et_login_email.text
-            et_login_email.setText("")
             val password = et_login_password.text
             et_login_password.setText("")
             if (email.toString() != "" && password.toString() != "") {

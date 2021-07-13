@@ -8,7 +8,7 @@ import retrofit2.http.*
 
 interface RentDetailsInterface {
 
-    @GET("rentdetails/getallrentdetails/")
+    @GET("rentdetails/getallrentdetails")
     fun getAllRentDetails(@Header("Authorization") token: String
     ): Call<Any>
 
