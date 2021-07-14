@@ -18,6 +18,10 @@ data class UserAllRentDetailsItem(
     val securityDeposit: String,
     @SerializedName("monthly_rent")
     val monthlyRent: String,
+    @SerializedName("owner_email")
+    val ownerEmail: String,
+    @SerializedName("owner_name")
+    val ownerName: String,
     @SerializedName("address")
     val address: String,
     @SerializedName("area")

@@ -24,6 +24,8 @@ class ProductDetailsActivity : AppCompatActivity() {
         val tvSecurityDeposit: TextView = findViewById(R.id.tvSecurityDeposit)
         val tvCity: TextView = findViewById(R.id.tvCity)
         val tvAddress: TextView = findViewById(R.id.tvAddress)
+        val tvOwner: TextView = findViewById(R.id.tvOwner)
+        val tvOwnerEmail: TextView = findViewById(R.id.tvOwnerEmail)
         val imageList = ArrayList<SlideModel>()
 
         val productDetailsString = intent.getStringExtra("productDetails")
@@ -55,6 +57,8 @@ class ProductDetailsActivity : AppCompatActivity() {
         tvSecurityDeposit.setText(productDetails.securityDeposit)
         tvCity.setText(productDetails.city)
         tvAddress.setText(productDetails.address)
+        tvOwner.setText(productDetails.ownerName)
+        tvOwnerEmail.setText(productDetails.ownerEmail)
 
 
     }

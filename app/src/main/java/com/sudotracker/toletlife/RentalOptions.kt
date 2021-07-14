@@ -97,7 +97,9 @@ class RentalOptions : AppCompatActivity() {
                     state = response[i].state,
                     statusId = response[i].statusId,
                     pincode = response[i].pincode,
-                    imageUrls = response[i].imageUrls
+                    imageUrls = response[i].imageUrls,
+                    ownerEmail = response[i].ownerEmail,
+                    ownerName = response[i].ownerName
                 )
             newArrayList.add(userAllRentDetailsItem)
         }
@@ -256,6 +258,12 @@ class RentalOptions : AppCompatActivity() {
         }
         bottomNavigationView.menu.getItem(1).setOnMenuItemClickListener {
             val intent = Intent(this, SearchRentDetails::class.java)
+            startActivity(intent)
+            finish()
+            return@setOnMenuItemClickListener true
+        }
+        bottomNavigationView.menu.getItem(3).setOnMenuItemClickListener {
+            val intent = Intent(this, UserRentListActivity::class.java)
             startActivity(intent)
             finish()
             return@setOnMenuItemClickListener true

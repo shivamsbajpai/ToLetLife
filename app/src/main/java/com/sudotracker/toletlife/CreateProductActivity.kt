@@ -178,6 +178,12 @@ class CreateProductActivity : AppCompatActivity() {
             finish()
             return@setOnMenuItemClickListener true
         }
+        bottomNavigationView.menu.getItem(3).setOnMenuItemClickListener {
+            val intent = Intent(this, UserRentListActivity::class.java)
+            startActivity(intent)
+            finish()
+            return@setOnMenuItemClickListener true
+        }
         bottomNavigationView.menu.getItem(4).setOnMenuItemClickListener {
             saveToken(null)
             val intent = Intent(this, MainActivity::class.java)
