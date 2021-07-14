@@ -211,8 +211,7 @@ class SearchRentDetails : AppCompatActivity() {
         }
 
         bottomNavigationView.menu.getItem(4).setOnMenuItemClickListener {
-            saveToken(null)
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
             finish()
             return@setOnMenuItemClickListener true

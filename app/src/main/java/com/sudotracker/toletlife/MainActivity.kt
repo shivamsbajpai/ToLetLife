@@ -26,6 +26,7 @@ import com.sudotracker.toletlife.Responses.OtpResponse
 import com.sudotracker.toletlife.Responses.ProductCategoryResponse
 import com.sudotracker.toletlife.Services.IdentityService
 import com.sudotracker.toletlife.Services.ProductCategoryService
+import com.sudotracker.toletlife.Services.UserProfileService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -284,11 +285,7 @@ class MainActivity : AppCompatActivity() {
                     val jsonResponse = gson.toJson(response.body())
                     Log.i("response",jsonResponse)
                     saveProductCategories(jsonResponse)
-                    progressBarVisibility(false)
-                    intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    Toast.makeText(this@MainActivity, "Login Successful", Toast.LENGTH_LONG).show()
-                    startActivity(intent)
-                    finish()
+                    getUserProfileDetails()
                     return
                 }
             }
@@ -311,4 +308,66 @@ class MainActivity : AppCompatActivity() {
             putString("productCategories",response)
         }.apply()
     }
+
+    private fun getUserProfileDetails(){
+        progressBarVisibility(true)
+        val jwtToken = loadJWTTokenData()
+        val call =
+            UserProfileService.userProfileInstance.getUserProfileDetails(token = "Bearer $jwtToken")
+        val gson = Gson()
+        val intent = Intent(this, RentalOptions::class.java)
+        call.enqueue(object : Callback<Any> {
+            override fun onResponse(call: Call<Any>, response: Response<Any>) {
+                if (response.code() == 422) {
+                    val type = object : TypeToken<ValidationErrorResponse>() {}.type
+                    val errorResponse: ValidationErrorResponse? =
+                        gson.fromJson(response.errorBody()?.charStream(), type)
+                    Toast.makeText(
+                        this@MainActivity,
+                        errorResponse?.detail?.first()?.msg.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                } else if (response.code() > 399) {
+                    val type = object : TypeToken<ErrorResponse>() {}.type
+                    val errorResponse: ErrorResponse? =
+                        gson.fromJson(response.errorBody()?.charStream(), type)
+                    Toast.makeText(
+                        this@MainActivity,
+                        errorResponse?.detail.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                } else if (response.code() == 200) {
+                    val jsonResponse = gson.toJson(response.body())
+                    Log.i("response",jsonResponse)
+                    saveUserProfileDetails(jsonResponse)
+                    progressBarVisibility(false)
+                    intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    Toast.makeText(this@MainActivity, "Login Successful", Toast.LENGTH_LONG).show()
+                    startActivity(intent)
+                    finish()
+                    return
+                }
+            }
+
+            override fun onFailure(call: Call<Any>, t: Throwable) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Could not connect to internet. Please try again.",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.d("failure", "Error in failure", t)
+            }
+        })
+    }
+
+    private fun saveUserProfileDetails(response: String) {
+        val sharedPreferences = getSharedPreferences("userProfileDetails", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.apply {
+            putString("userProfileDetails",response)
+        }.apply()
+    }
+
 }

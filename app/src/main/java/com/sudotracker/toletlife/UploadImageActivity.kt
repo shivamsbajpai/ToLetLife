@@ -55,6 +55,8 @@ class UploadImageActivity : AppCompatActivity() {
 
 
         image_view.setOnClickListener {
+            val progress_bar: ProgressBar = findViewById(R.id.progress_bar)
+            progress_bar.progress = 0
             openImageChooser()
         }
         button_upload.setOnClickListener {
@@ -104,31 +106,6 @@ class UploadImageActivity : AppCompatActivity() {
         inputStream.copyTo(outputStream)
         presignedUrl(file_type!!, rent_id, loadJWTTokenData(), file)
 
-        // progress_bar.progress = 0
-//        val body = UploadRequestBody(file, "image", this)
-//        MyAPI().uploadImage(
-//            MultipartBody.Part.createFormData(
-//                "image",
-//                file.name,
-//                body
-//            ),
-//            RequestBody.create(MediaType.parse("multipart/form-data"), "json")
-//        ).enqueue(object : Callback<UploadResponse> {
-//            override fun onFailure(call: Call<UploadResponse>, t: Throwable) {
-//                layout_root.snackbar(t.message!!)
-//                progress_bar.progress = 0
-//            }
-//
-//            override fun onResponse(
-//                call: Call<UploadResponse>,
-//                response: Response<UploadResponse>
-//            ) {
-//                response.body()?.let {
-//                    layout_root.snackbar(it.message)
-//                    progress_bar.progress = 100
-//                }
-//            }
-//        })
 
     }
 
@@ -373,8 +350,7 @@ class UploadImageActivity : AppCompatActivity() {
         }
 
         bottomNavigationView.menu.getItem(4).setOnMenuItemClickListener {
-            saveToken(null)
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
             finish()
             return@setOnMenuItemClickListener true
