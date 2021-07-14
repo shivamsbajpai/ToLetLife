@@ -133,6 +133,7 @@ class SettingsActivity : AppCompatActivity() {
                     return
                 } else if (response.code() == 200) {
                     saveToken(null)
+                    Toast.makeText(this@SettingsActivity,"Your account is deleted",Toast.LENGTH_LONG).show()
                     val intent = Intent(this@SettingsActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
