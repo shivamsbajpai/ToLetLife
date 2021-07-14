@@ -2,16 +2,14 @@ package com.sudotracker.toletlife
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,7 +43,13 @@ class SettingsActivity : AppCompatActivity() {
         val btn_move_to_feedback: Button = findViewById(R.id.btn_move_to_feedback)
         val btn_log_out: Button = findViewById(R.id.btn_log_out)
         val btn_delete_account: Button = findViewById(R.id.btn_delete_account)
+        val tv_settings_developer_url: TextView = findViewById(R.id.tv_settings_developer_url)
 
+        tv_settings_developer_url.setOnClickListener{
+            val defaultBrowser = Intent.makeMainSelectorActivity(Intent.ACTION_MAIN,Intent.CATEGORY_APP_BROWSER)
+            defaultBrowser.data = Uri.parse("https://tinyurl.com/3jyarv3h")
+            startActivity(defaultBrowser)
+        }
         et_settings_user_email.isFocusable = false
         et_settings_user_email.inputType = InputType.TYPE_NULL
         et_settings_user_email.isClickable = true
