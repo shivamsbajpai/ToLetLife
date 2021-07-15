@@ -10,11 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
@@ -48,6 +47,9 @@ class UploadImageActivity : AppCompatActivity() {
         val jwtToken = loadJWTTokenData()
         val image_view: ImageView = findViewById(R.id.image_view)
         val button_upload: Button = findViewById(R.id.button_upload)
+
+        val tv_activiy_upload_image_success: TextView = findViewById(R.id.tv_activiy_upload_image_success)
+        tv_activiy_upload_image_success.visibility = View.GONE
 
         val rent_id = intent.getStringExtra("rent_id")
 
@@ -297,6 +299,8 @@ class UploadImageActivity : AppCompatActivity() {
                         "Image Uploaded Successfully",
                         Toast.LENGTH_LONG
                     ).show()
+                    val tv_activiy_upload_image_success: TextView = findViewById(R.id.tv_activiy_upload_image_success)
+                    tv_activiy_upload_image_success.visibility = View.VISIBLE
                     return
                 }
             }

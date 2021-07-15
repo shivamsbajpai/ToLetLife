@@ -44,7 +44,7 @@
                 android:fontFamily="@font/bree_serif"
                 android:layout_alignParentTop="true"
                 android:gravity="center"
-                android:text="Add Your Product Images"
+                android:text="Tap above to select image"
                 android:textColor="@color/tolet_logo"
                 android:textSize="25sp"
                 android:textStyle="bold" />
@@ -72,6 +72,17 @@
                 android:background="@drawable/button_background"
                 >
             </Button>
+            <TextView
+                android:id="@+id/tv_activiy_upload_image_success"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="Product is listed successfully. You can still add more images"
+                android:textColor="@color/input_text_color"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:visibility="gone"
+                />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
