@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="top"
+    android:background="@color/background_color"
+    android:orientation="vertical"
+    tools:context=".CreateProductActivity">
+
+    <ProgressBar
+        android:id="@+id/create_product_activity_circular_progress_load"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:progressTint="@color/button_color"
+        />
+
+    <TextView
+        android:id="@+id/tv_create_product_activity_app_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:padding="10dp"
+        android:fontFamily="@font/bree_serif"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="Rent out your product"
+        android:textColor="@color/tolet_logo"
+        android:textSize="35sp"
+        android:textStyle="bold" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_below="@+id/tv_create_product_activity_app_name"
+        android:layout_marginTop="10dp"
+        app:cardBackgroundColor="@color/background_color"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/et_create_product"
+                android:hint="Product"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:textSize="20sp"
+                android:textColor="@color/input_text_color"
+                android:backgroundTint="@color/edit_text_color"
+                android:textColorHint="@color/input_hint_color" />
+            <Spinner
+                android:id="@+id/spinner_create_product"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:popupBackground="@color/background_color"
+                android:spinnerMode="dropdown"/>
+            <EditText
+                android:id="@+id/et_create_product_description"
+                android:hint="Product Description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:textSize="20sp"
+                android:textColor="@color/input_text_color"
+                android:backgroundTint="@color/edit_text_color"
+                android:textColorHint="@color/input_hint_color" />
+            <EditText
+                android:id="@+id/et_create_product_security_deposit"
+                android:hint="Security Deposit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:textSize="20sp"
+                android:inputType="number"
+                android:textColor="@color/input_text_color"
+                android:backgroundTint="@color/edit_text_color"
+                android:textColorHint="@color/input_hint_color" />
+            <EditText
+                android:id="@+id/et_create_product_monthly_rent"
+                android:hint="Monthly Rent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:inputType="number"
+                android:textSize="20sp"
+                android:textColor="@color/input_text_color"
+                android:backgroundTint="@color/edit_text_color"
+                android:textColorHint="@color/input_hint_color" />
+            <TextView
+                android:id="@+id/tv_create_rent_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Error"
+                android:textColor="@color/error_color"
+                android:visibility="invisible"
+                />
+            <Button
+                style="?android:attr/borderlessButtonStyle"
+                android:id="@+id/btn_create_product"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Add Product"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                app:backgroundTint="@color/button_color"
+                android:background="@drawable/button_background"
+                >
+            </Button>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/create_rent_coordinator"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true">
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottomAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:fabCradleMargin="20dp"
+            app:fabCradleRoundedCornerRadius="20dp"
+            app:fabCradleVerticalOffset="10dp"
+            app:backgroundTint="@color/background_color">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                android:background="@android:color/transparent"
+                app:itemTextColor="@drawable/selector"
+                app:itemIconTint="@drawable/selector"
+                app:menu="@menu/bottom_nav_menu" />
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/button_color"
+            android:src="@drawable/ic_add"
+            app:layout_anchor="@id/bottomAppBar" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</RelativeLayout>
